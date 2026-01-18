@@ -600,7 +600,7 @@
           
           showLoading("Enviando");
           var username = cargoNickname.split(' ').pop();
-          send_MP("[DIR] Carta de Abertura de Análise", username, mp);
+          send_MPGroupMulti("[DIR] Carta de Abertura de Análise", mp, [146]);
       }
 
       function enviarCartaPunicao(e) {
@@ -663,39 +663,39 @@
         }
 
       function send_MP(title, user, message) {
-          showLoading("Enviando");
-          
-          fetch('/privmsg', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/x-www-form-urlencoded',
-              },
-              body: new URLSearchParams({
-                  folder: 'inbox',
-                  mode: 'post',
-                  post: '1',
-                  username: user,
-                  subject: title,
-                  message: message
-              })
-          })
-          .then(response => {
-              if (response.ok) {
-                  showLoading("Enviado! Redirecionando", true);
-                  setTimeout(() => {
-                      hideLoading();
-                      location.reload();
-                  }, 1500);
-              } else {
-                  hideLoading();
-                  alert("Erro ao enviar mensagem!");
-              }
-          })
-          .catch(error => {
-              hideLoading();
-              alert("Erro: " + error);
-          });
-      }
+            showLoading("Enviando");
+            
+            fetch('/privmsg', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    folder: 'inbox',
+                    mode: 'post',
+                    post: '1',
+                    username: user,
+                    subject: title,
+                    message: message
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    showLoading("Enviado! Redirecionando", true);
+                    setTimeout(() => {
+                        hideLoading();
+                        window.location.href = 'https://www.policiarcc.com/privmsg?folder=inbox';
+                    }, 1500);
+                } else {
+                    hideLoading();
+                    alert("Erro ao enviar mensagem!");
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                alert("Erro: " + error);
+            });
+        }
 
       function enviarMelhoresQuinzena(event) {
             event.preventDefault();
@@ -992,7 +992,7 @@
                         showLoading(`Enviado para ${groups.length} grupos! Redirecionando`, true);
                         setTimeout(() => {
                             hideLoading();
-                            location.reload();
+                            window.location.href = 'https://www.policiarcc.com/privmsg?folder=inbox';
                         }, 1500);
                     } else {
                         hideLoading();
