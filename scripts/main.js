@@ -1038,87 +1038,69 @@
             }
         }
 
-      function formatarData(data) {
-            const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-            const dia = data.getDate().toString().padStart(2, '0');
-            const mes = meses[data.getMonth()];
-            const ano = data.getFullYear();
-            return `${dia} ${mes} ${ano}`;
-        }
+function formatarData(data) {
+    const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+    const dia = data.getDate().toString().padStart(2, '0');
+    const mes = meses[data.getMonth()];
+    const ano = data.getFullYear();
+    return `${dia} ${mes} ${ano}`;
+}
 
-        function calcularDataFinal(dataInicial) {
-            const data = new Date(dataInicial);
-            data.setDate(data.getDate() + 30);
-            return formatarData(data);
-        }
+function calcularDataFinal(dataInicial) {
+    const partes = dataInicial.split(' ');
+    if (partes.length !== 3) return "";
+    
+    const dia = parseInt(partes[0]);
+    const mesStr = partes[1];
+    const ano = parseInt(partes[2]);
 
-        function atualizarVisibilidadeDataFinal() {
-            const tipoPunicao = document.querySelector('input[name="tipo_punicao"]:checked');
-            const dataFinalContainer = document.getElementById("data_final_container");
-            
-            if (tipoPunicao && dataFinalContainer) {
-                const mostrarDataFinal = tipoPunicao.value === 'advertencia_interna' || 
-                                    tipoPunicao.value === 'advertencia_escrita' ||
-                                    tipoPunicao.value === 'advertencia_verbal';
-                
-                if (mostrarDataFinal) {
-                    dataFinalContainer.style.display = 'block';
-                } else {
-                    dataFinalContainer.style.display = 'none';
-                }
+    const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+    const mesIndex = meses.indexOf(mesStr);
+    
+    if (mesIndex === -1 || isNaN(dia) || isNaN(ano)) return "";
+    
+    const data = new Date(ano, mesIndex, dia);
+    data.setDate(data.getDate() + 30);
+    return formatarData(data);
+}
+
+function atualizarVisibilidadeDataFinal() {
+    const tipoPunicao = document.querySelector('input[name="tipo_punicao"]:checked');
+    const dataFinalContainer = document.getElementById("data_final_container");
+    
+    if (tipoPunicao && dataFinalContainer) {
+        const mostrarDataFinal = tipoPunicao.value === 'advertencia_interna' || 
+                                tipoPunicao.value === 'advertencia_escrita' ||
+                                tipoPunicao.value === 'advertencia_verbal';
+        
+        if (mostrarDataFinal) {
+            dataFinalContainer.style.display = 'block';
+        } else {
+            dataFinalContainer.style.display = 'none';
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const dataInicialInput = document.getElementById('data_inicial_punicao');
+    const dataFinalInput = document.getElementById('data_final_punicao');
+    
+    if (dataInicialInput && dataFinalInput) {
+        const hoje = new Date();
+        dataInicialInput.value = formatarData(hoje);
+        dataFinalInput.value = calcularDataFinal(formatarData(hoje));
+    }
+    
+    document.querySelectorAll('input[name="tipo_punicao"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const dataInicial = document.getElementById('data_inicial_punicao').value;
+            if (dataInicial) {
+                document.getElementById('data_final_punicao').value = calcularDataFinal(dataInicial);
             }
-        }
-
-        function atualizarVisibilidadeComprovacaoRegresso() {
-            const checkboxes = document.querySelectorAll('#regresso_especializacao input[type="checkbox"]:checked');
-            const linkContainer = document.getElementById('link_comprovacao_container');
-            const linkInput = document.getElementById('link_comprovacao');
-            
-            let precisaComprovacao = false;
-            
-            checkboxes.forEach(checkbox => {
-                const precisaAnexo = checkbox.getAttribute('data-anexo') === 'true';
-                if (precisaAnexo) {
-                    precisaComprovacao = true;
-                }
-            });
-            
-            if (linkContainer && linkInput) {
-                if (precisaComprovacao) {
-                    linkContainer.style.display = 'flex';
-                    linkInput.required = true;
-                } else {
-                    linkContainer.style.display = 'none';
-                    linkInput.required = false;
-                    linkInput.value = '';
-                }
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const dataInicialInput = document.getElementById('data_inicial_punicao');
-            const dataFinalInput = document.getElementById('data_final_punicao');
-
-            const checkboxesRegresso = document.querySelectorAll('#regresso_especializacao input[type="checkbox"]');
-            checkboxesRegresso.forEach(checkbox => {
-                checkbox.addEventListener('change', atualizarVisibilidadeComprovacaoRegresso);
-            });
-            
-            if (dataInicialInput && dataFinalInput) {
-                const hoje = new Date();
-                dataInicialInput.value = formatarData(hoje);
-                dataFinalInput.value = calcularDataFinal(hoje);
-            }
-            document.querySelectorAll('input[name="tipo_punicao"]').forEach(radio => {
-                radio.addEventListener('change', function() {
-                    const dataInicial = document.getElementById('data_inicial_punicao').value;
-                    if (dataInicial) {
-                        const dataObj = new Date(dataInicial.split(' ').reverse().join('-'));
-                        document.getElementById('data_final_punicao').value = calcularDataFinal(dataObj);
-                    }
-                    atualizarVisibilidadeDataFinal();
-                });
-            });
             atualizarVisibilidadeDataFinal();
-            atualizarVisibilidadeComprovacaoRegresso();
         });
+    });
+    
+    atualizarVisibilidadeDataFinal();
+    atualizarVisibilidadeComprovacaoRegresso();
+});
