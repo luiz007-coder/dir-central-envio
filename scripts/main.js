@@ -1047,13 +1047,13 @@ function formatarData(data) {
 }
 
 function calcularDataFinal(dataInicial) {
+    if (!dataInicial) return "";
     const partes = dataInicial.split(' ');
     if (partes.length !== 3) return "";
     
     const dia = parseInt(partes[0]);
     const mesStr = partes[1];
     const ano = parseInt(partes[2]);
-
     const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
     const mesIndex = meses.indexOf(mesStr);
     
@@ -1090,17 +1090,32 @@ document.addEventListener('DOMContentLoaded', function() {
         dataInicialInput.value = formatarData(hoje);
         dataFinalInput.value = calcularDataFinal(formatarData(hoje));
     }
+
+    if (dataInicialInput) {
+        dataInicialInput.addEventListener('change', function() {
+            if (dataFinalInput) {
+                dataFinalInput.value = calcularDataFinal(this.value);
+            }
+        });
+    }
     
     document.querySelectorAll('input[name="tipo_punicao"]').forEach(radio => {
         radio.addEventListener('change', function() {
-            const dataInicial = document.getElementById('data_inicial_punicao').value;
-            if (dataInicial) {
-                document.getElementById('data_final_punicao').value = calcularDataFinal(dataInicial);
-            }
             atualizarVisibilidadeDataFinal();
+            
+            const dataInicial = document.getElementById('data_inicial_punicao').value;
+            const dataFinalInput = document.getElementById('data_final_punicao');
+            
+            if (dataInicial && dataFinalInput && 
+                (this.value === 'advertencia_interna' || 
+                 this.value === 'advertencia_escrita' || 
+                 this.value === 'advertencia_verbal')) {
+                dataFinalInput.value = calcularDataFinal(dataInicial);
+            }
         });
     });
     
     atualizarVisibilidadeDataFinal();
     atualizarVisibilidadeComprovacaoRegresso();
 });
+
