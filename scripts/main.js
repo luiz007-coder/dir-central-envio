@@ -1119,165 +1119,36 @@ document.addEventListener('DOMContentLoaded', function() {
     atualizarVisibilidadeComprovacaoRegresso();
 
     setTimeout(function() {
-        let dataInput = document.getElementById('data_inicial_punicao');
+        const todosInputs = document.querySelectorAll('input');
+        todosInputs.forEach(input => {
+            input.removeAttribute('readonly');
+            input.removeAttribute('disabled');
+            input.style.cssText += 'cursor: text !important; background-color: #1a1a1a !important;';
+        });
 
-        if (!dataInput) {
-            console.log('Não encontrou pelo ID, tentando outros métodos...');
-            dataInput = document.querySelector('input[placeholder*="Ex: 15 Dez 2023"]');
-        }
-
-        if (!dataInput) {
-            const inputs = document.querySelectorAll('input[type="text"]');
-            for (let input of inputs) {
-                if (input.parentElement && input.parentElement.querySelector('span') && 
-                    input.parentElement.querySelector('span').textContent.includes('DATA')) {
-                    dataInput = input;
-                    break;
-                }
-            }
-        }
-
-        if (!dataInput) {
-            const cards = document.querySelectorAll('.card');
-            for (let card of cards) {
-                const h2 = card.querySelector('h2');
-                if (h2 && h2.textContent.includes('PUNIÇÃO')) {
-                    const forms = card.querySelectorAll('form');
-                    for (let form of forms) {
-                        const spans = form.querySelectorAll('span.details_span');
-                        for (let span of spans) {
-                            if (span.textContent.includes('DATA INÍCIO')) {
-                                const parentDiv = span.parentElement;
-                                if (parentDiv && parentDiv.classList.contains('input-box')) {
-                                    const novoInput = document.createElement('input');
-                                    novoInput.type = 'text';
-                                    novoInput.id = 'data_inicial_punicao';
-                                    novoInput.placeholder = 'Ex: 15 Dez 2023';
-                                    novoInput.value = '01 Jan 2024';
-                                    novoInput.style.cssText = `
-                                        width: 100%;
-                                        background: rgba(23, 23, 23, 0.9);
-                                        border: 2px solid #85e300;
-                                        color: #ffffff;
-                                        outline: none;
-                                        padding: 12px 15px;
-                                        border-radius: 10px;
-                                        font-size: 14px;
-                                        font-family: 'Poppins', sans-serif;
-                                        cursor: text;
-                                    `;
-
-                                    const oldInput = parentDiv.querySelector('input');
-                                    if (oldInput) {
-                                        parentDiv.removeChild(oldInput);
-                                    }
-
-                                    parentDiv.appendChild(novoInput);
-                                    dataInput = novoInput;
-                                    break;
-                                }
-                            }
-                        }
-                        if (dataInput) break;
-                    }
-                    if (dataInput) break;
-                }
-            }
-        }
-
+        const dataInput = document.getElementById('data_inicial_punicao');
         if (dataInput) {
             dataInput.removeAttribute('readonly');
             dataInput.removeAttribute('disabled');
-
-            dataInput.style.cursor = 'text';
-            dataInput.style.borderColor = '#85e300';
-            dataInput.style.boxShadow = '0 0 5px #85e300';
-
-            dataInput.addEventListener('focus', function() {
-                this.style.borderColor = '#ff0000';
-                this.style.boxShadow = '0 0 10px #ff0000';
-            });
-            
-            dataInput.addEventListener('blur', function() {
-                this.style.borderColor = '#85e300';
-                this.style.boxShadow = '0 0 5px #85e300';
-            });
-
-            dataInput.focus();
-            dataInput.select();
-            
-            alert('INPUT DA DATA AGORA É EDITÁVEL!\n\nClique no campo de data e edite como quiser!\nA borda ficou verde para mostrar que funciona.');
-
-            const forceBtn = document.createElement('button');
-            forceBtn.textContent = 'EDITAR DATA';
-            forceBtn.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                background: #ff0000;
-                color: white;
-                border: none;
-                padding: 10px 15px;
-                border-radius: 5px;
-                cursor: pointer;
-                z-index: 9999;
-                font-weight: bold;
-            `;
-            forceBtn.onclick = function() {
-                if (dataInput) {
-                    dataInput.focus();
-                    dataInput.select();
-                    alert('Clique no campo e edite a data!');
-                }
-            };
-            document.body.appendChild(forceBtn);
-            
-        } else {
-            console.error('NÃO CONSEGUIU ENCONTRAR O INPUT!');
-            alert('NÃO ENCONTREI O INPUT DA DATA!\nMas criei um botão vermelho na tela.\nClique nele para forçar a edição.');
-
-            const emergencyBtn = document.createElement('button');
-            emergencyBtn.textContent = 'CLIQUE AQUI PARA EDITAR DATA';
-            emergencyBtn.style.cssText = `
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: #ff0000;
-                color: white;
-                border: none;
-                padding: 20px 30px;
-                border-radius: 10px;
-                cursor: pointer;
-                z-index: 99999;
-                font-size: 18px;
-                font-weight: bold;
-                box-shadow: 0 0 20px red;
-            `;
-            emergencyBtn.onclick = function() {
-                const novoInput = document.createElement('input');
-                novoInput.type = 'text';
-                novoInput.value = '01 Jan 2024';
-                novoInput.style.cssText = `
-                    position: fixed;
-                    top: 30%;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    width: 200px;
-                    padding: 15px;
-                    font-size: 16px;
-                    background: black;
-                    color: white;
-                    border: 3px solid #85e300;
-                    z-index: 999999;
-                `;
-                document.body.appendChild(novoInput);
-                novoInput.focus();
-                novoInput.select();
-                alert('Digite a data que quiser!');
-            };
-            document.body.appendChild(emergencyBtn);
+            dataInput.style.cssText = 'cursor: text !important; background-color: #1a1a1a !important; border-color: #85e300 !important;';
+            console.log('Input da data liberado:', dataInput);
         }
+
+        const style = document.createElement('style');
+        style.textContent = `
+            #data_inicial_punicao,
+            input[type="text"],
+            input[placeholder*="Ex:"] {
+                cursor: text !important;
+                background-color: #1a1a1a !important;
+                border: 2px solid #85e300 !important;
+                pointer-events: auto !important;
+                user-select: text !important;
+                -webkit-user-select: text !important;
+            }
+        `;
+        document.head.appendChild(style);
+        alert('TODOS OS INPUTS LIBERADOS!\nAgora você pode clicar e editar qualquer campo.');
         
-    }, 2000);
+    }, 1000);
 });
