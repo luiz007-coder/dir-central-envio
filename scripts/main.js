@@ -1119,102 +1119,113 @@ document.addEventListener('DOMContentLoaded', function() {
     atualizarVisibilidadeComprovacaoRegresso();
 
     document.addEventListener('DOMContentLoaded', function() {
-        const dataInput = document.getElementById('data_inicial_punicao');
-        if (!dataInput) return;
-        
-        const container = dataInput.parentElement;
-        const wrapper = document.createElement('div');
-        wrapper.style.cssText = 'position: relative; width: 100%;';
-        
-        container.insertBefore(wrapper, dataInput);
-        wrapper.appendChild(dataInput);
-        
-        const editBtn = document.createElement('button');
-        editBtn.type = 'button';
-        editBtn.innerHTML = '<i class="fas fa-edit"></i>';
-        editBtn.title = 'Editar data';
-        editBtn.style.cssText = `
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(133, 227, 0, 0.2);
-            border: 1px solid #85e300;
-            color: #85e300;
-            width: 30px;
-            height: 30px;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            transition: all 0.3s ease;
-            z-index: 10;
-        `;
-        
-        editBtn.onmouseover = function() {
-            this.style.background = 'rgba(133, 227, 0, 0.3)';
-            this.style.transform = 'translateY(-50%) scale(1.05)';
-        };
-        
-        editBtn.onmouseout = function() {
-            this.style.background = 'rgba(133, 227, 0, 0.2)';
-            this.style.transform = 'translateY(-50%)';
-        };
-        
-        wrapper.appendChild(editBtn);
-        
-        dataInput.style.paddingRight = '45px';
-        dataInput.style.cursor = 'text';
-        dataInput.readOnly = false;
-        
-        editBtn.onclick = function() {
-            dataInput.focus();
-            dataInput.select();
-        };
-        
-        if (dataInput.value === '') {
-            const today = new Date();
-            const day = today.getDate().toString().padStart(2, '0');
-            const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-            const month = monthNames[today.getMonth()];
-            const year = today.getFullYear();
-            dataInput.value = `${day} ${month} ${year}`;
+        function adicionarBotaoEditarData() {
+            const dataInput = document.getElementById('data_inicial_punicao');
+            
+            if (!dataInput) {
+                setTimeout(adicionarBotaoEditarData, 500);
+                return;
+            }
+            
+            if (dataInput.nextElementSibling && dataInput.nextElementSibling.classList && 
+                dataInput.nextElementSibling.classList.contains('botao-editar-data')) {
+                return;
+            }
+            
+            const editBtn = document.createElement('button');
+            editBtn.type = 'button';
+            editBtn.innerHTML = '<i class="fas fa-edit"></i>';
+            editBtn.title = 'Editar data';
+            editBtn.className = 'botao-editar-data';
+            
+            const style = document.createElement('style');
+            style.textContent = `
+                .botao-editar-data {
+                    position: absolute;
+                    right: 15px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    background: #85e300;
+                    border: none;
+                    color: #000;
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 14px;
+                    transition: all 0.3s ease;
+                    z-index: 10;
+                }
+                
+                .botao-editar-data:hover {
+                    background: #a8ff33;
+                    transform: translateY(-50%) scale(1.1);
+                }
+                
+                .input-box[data-input="data_inicial_punicao"] {
+                    position: relative !important;
+                }
+                
+                #data_inicial_punicao {
+                    padding-right: 50px !important;
+                    cursor: text !important;
+                }
+            `;
+            document.head.appendChild(style);
+            
+            const inputBox = dataInput.closest('.input-box');
+            if (inputBox) {
+                inputBox.style.position = 'relative';
+                inputBox.setAttribute('data-input', 'data_inicial_punicao');
+                inputBox.appendChild(editBtn);
+            }
+            
+            dataInput.readOnly = false;
+            
+            editBtn.onclick = function() {
+                dataInput.focus();
+                dataInput.select();
+            };
+            
+            if (dataInput.value === '') {
+                const today = new Date();
+                const day = today.getDate().toString().padStart(2, '0');
+                const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+                const month = monthNames[today.getMonth()];
+                const year = today.getFullYear();
+                dataInput.value = `${day} ${month} ${year}`;
+            }
+            
+            dataInput.addEventListener('blur', function() {
+                const value = this.value.trim();
+                if (value) {
+                    const parts = value.split(' ');
+                    if (parts.length === 3) {
+                        let day = parts[0];
+                        let month = parts[1];
+                        const year = parts[2];
+                        
+                        day = day.replace(/\D/g, '');
+                        if (day.length > 2) day = day.substring(0, 2);
+                        if (day.length === 1) day = '0' + day;
+                        
+                        const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+                        if (month.length > 3) month = month.substring(0, 3);
+                        month = month.charAt(0).toUpperCase() + month.slice(1).toLowerCase();
+                        
+                        if (!monthNames.includes(month)) {
+                            month = 'Jan';
+                        }
+                        
+                        this.value = `${day} ${month} ${year}`;
+                    }
+                }
+            });
         }
         
-        dataInput.addEventListener('blur', function() {
-            const value = this.value.trim();
-            if (value) {
-                const parts = value.split(' ');
-                if (parts.length === 3) {
-                    let day = parts[0];
-                    let month = parts[1];
-                    const year = parts[2];
-                    
-                    day = day.replace(/\D/g, '');
-                    if (day.length > 2) day = day.substring(0, 2);
-                    if (day.length === 1) day = '0' + day;
-                    
-                    const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-                    if (month.length > 3) month = month.substring(0, 3);
-                    month = month.charAt(0).toUpperCase() + month.slice(1).toLowerCase();
-                    
-                    if (!monthNames.includes(month)) {
-                        month = 'Jan';
-                    }
-                    
-                    this.value = `${day} ${month} ${year}`;
-                }
-            }
-        });
-        
-        dataInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                this.blur();
-            }
-        });
+        setTimeout(adicionarBotaoEditarData, 1000);
     });
 });
-
-
